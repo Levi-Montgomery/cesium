@@ -57,7 +57,7 @@ vec3 addClearcoatReflection(vec3 baseLayerColor, vec3 position, vec3 lightDirect
         #endif
         float maximumComponent = czm_maximumComponent(lightColorHdr);
         vec3 clampedLightColor = lightColorHdr / max(maximumComponent, 1.0);
-        color += clampedLightColor* iblColor * material.occlusion;
+        color += clampedLightColor * iblColor * material.occlusion;
     #endif
 
     float clearcoatFactor = material.clearcoatFactor;

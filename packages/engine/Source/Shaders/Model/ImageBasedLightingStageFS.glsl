@@ -203,7 +203,7 @@ vec3 textureIBL(
     czm_modelMaterial material
 ) {
     // Find the direction in which to sample the environment map
-    vec3 cubeDir = normalize(model_iblReferenceFrameMatrix * normalize(reflect(-viewDirectionEC, normalEC)));
+    vec3 cubeDir = normalize(model_iblReferenceFrameMatrix * reflect(-viewDirectionEC, normalEC));
 
     #ifdef DIFFUSE_IBL
         vec3 diffuseContribution = computeDiffuseIBL(cubeDir) * material.diffuse;
@@ -211,7 +211,7 @@ vec3 textureIBL(
         vec3 diffuseContribution = vec3(0.0); 
     #endif
 
-    float roughness = material.roughness;
+    float roughness = sqrt(material.roughness);
 
     #ifdef USE_ANISOTROPY
         // Update environment map sampling direction to account for anisotropic distortion of specular reflection
@@ -221,7 +221,7 @@ vec3 textureIBL(
         float bendFactor = 1.0 - material.anisotropyStrength * (1.0 - roughness);
         float bendFactorPow4 = bendFactor * bendFactor * bendFactor * bendFactor;
         vec3 bentNormal = normalize(mix(anisotropicNormal, normalEC, bendFactorPow4));
-        cubeDir = normalize(model_iblReferenceFrameMatrix * normalize(reflect(-viewDirectionEC, bentNormal)));
+        cubeDir = normalize(model_iblReferenceFrameMatrix * reflect(-viewDirectionEC, bentNormal));
     #endif
 
     #ifdef SPECULAR_IBL
