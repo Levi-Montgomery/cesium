@@ -45,8 +45,7 @@ vec3 getProceduralSpecularIrradiance(vec3 reflectionWC, vec3 skyMetrics, float r
     reflectionWC = -normalize(czm_temeToPseudoFixed * reflectionWC);
     reflectionWC.x = -reflectionWC.x;
 
-    // TODO: Why 1.04 ?
-    float inverseRoughness = 1.04 - roughness;
+    float inverseRoughness = 1.0 - roughness;
     inverseRoughness *= inverseRoughness;
     vec3 sceneSkyBox = czm_textureCube(czm_environmentMap, reflectionWC).rgb * inverseRoughness;
 
@@ -58,7 +57,6 @@ vec3 getProceduralSpecularIrradiance(vec3 reflectionWC, vec3 skyMetrics, float r
     vec3 zenithColor = mix(blueSkyColor, sceneSkyBox, skyMetrics.z);
 
     // Compute blend zones
-    // TODO: Isn't 1.0 - inverseRoughness basically roughness?
     float blendRegionSize = 0.1 * ((1.0 - inverseRoughness) * 8.0 + 1.1 - skyMetrics.x);
     float blendRegionOffset = roughness * -1.0;
     float farAboveHorizon = clamp(skyMetrics.x - blendRegionSize * 0.5 + blendRegionOffset, 1.0e-10 - blendRegionSize, 0.99999);

@@ -271,7 +271,7 @@ float setMetallicRoughness(inout czm_modelMaterial material)
 
         vec3 metallicRoughness = texture(u_metallicRoughnessTexture, metallicRoughnessTexCoords).rgb;
         float metalness = clamp(metallicRoughness.b, 0.0, 1.0);
-        float roughness = clamp(metallicRoughness.g, 0.04, 1.0);
+        float roughness = clamp(metallicRoughness.g, 0.0, 1.0);
         #ifdef HAS_METALLIC_FACTOR
             metalness = clamp(metalness * u_metallicFactor, 0.0, 1.0);
         #endif
@@ -287,7 +287,7 @@ float setMetallicRoughness(inout czm_modelMaterial material)
         #endif
 
         #ifdef HAS_ROUGHNESS_FACTOR
-            float roughness = clamp(u_roughnessFactor, 0.04, 1.0);
+            float roughness = clamp(u_roughnessFactor, 0.0, 1.0);
         #else
             float roughness = 1.0;
         #endif
