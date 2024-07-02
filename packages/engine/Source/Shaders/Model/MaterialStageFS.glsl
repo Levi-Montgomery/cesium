@@ -258,8 +258,7 @@ void setSpecularGlossiness(inout czm_modelMaterial material)
     material.specular = specular;
 
     // glossiness is the opposite of roughness, but easier for artists to use.
-    float roughness = 1.0 - glossiness;
-    material.roughness = roughness * roughness;
+    material.roughness = 1.0 - glossiness;
 }
 #elif defined(LIGHTING_PBR)
 float setMetallicRoughness(inout czm_modelMaterial material)
@@ -303,9 +302,8 @@ float setMetallicRoughness(inout czm_modelMaterial material)
     // diffuse only applies to dielectrics.
     material.diffuse = mix(material.baseColor.rgb, vec3(0.0), metalness);
 
-    // roughness is authored as perceptual roughness
-    // square it to get material roughness
-    material.roughness = roughness * roughness;
+    // This is perceptual roughness, which will have to be squared for many calculations
+    material.roughness = roughness;
 
     return metalness;
 }
@@ -418,9 +416,8 @@ void setClearcoat(inout czm_modelMaterial material, in ProcessedAttributes attri
     #endif
 
     material.clearcoatFactor = clearcoatFactor;
-    // roughness is authored as perceptual roughness
-    // square it to get material roughness
-    material.clearcoatRoughness = clearcoatRoughness * clearcoatRoughness;
+    // This is perceptual roughness, which will have to be squared for many calculations
+    material.clearcoatRoughness = clearcoatRoughness;
     #ifdef HAS_CLEARCOAT_NORMAL_TEXTURE
         material.clearcoatNormal = getClearcoatNormalFromTexture(attributes, attributes.normalEC);
     #else

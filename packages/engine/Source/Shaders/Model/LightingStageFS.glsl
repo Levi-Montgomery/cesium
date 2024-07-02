@@ -34,7 +34,8 @@ vec3 addClearcoatReflection(vec3 baseLayerColor, vec3 position, vec3 lightDirect
 
     // compute specular reflection from direct lighting
     float roughness = material.clearcoatRoughness;
-    float directStrength = computeDirectSpecularStrength(normal, lightDirection, viewDirection, halfwayDirection, roughness);
+    float alphaRoughness = roughness * roughness;
+    float directStrength = computeDirectSpecularStrength(normal, lightDirection, viewDirection, halfwayDirection, alphaRoughness);
     vec3 directReflection = F * directStrength * NdotL;
     vec3 color = lightColorHdr * directReflection;
 
@@ -49,6 +50,7 @@ vec3 addClearcoatReflection(vec3 baseLayerColor, vec3 position, vec3 lightDirect
         vec3 skyMetrics = getProceduralSkyMetrics(positionWC, reflectionWC);
 
         vec3 specularIrradiance = getProceduralSpecularIrradiance(reflectionWC, skyMetrics, roughness);
+        // TODO: verify if LUT needs perceptual or alpha roughness
         vec2 brdfLut = texture(czm_brdfLut, vec2(NdotV, roughness)).rg;
         vec3 specularColor = czm_srgbToLinear(f0 * brdfLut.x + brdfLut.y);
         vec3 iblColor = specularIrradiance * specularColor * model_iblFactor.y;
