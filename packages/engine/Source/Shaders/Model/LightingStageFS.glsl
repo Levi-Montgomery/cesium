@@ -42,7 +42,7 @@ vec3 addClearcoatReflection(vec3 baseLayerColor, vec3 position, vec3 lightDirect
     #ifdef SPECULAR_IBL
         // Find the direction in which to sample the environment map
         vec3 cubeDir = normalize(model_iblReferenceFrameMatrix * normalize(reflect(-viewDirection, normal)));
-        vec3 iblColor = computeSpecularIBL(cubeDir, NdotV, NdotV, f0, roughness);
+        vec3 iblColor = computeSpecularIBL(cubeDir, NdotV, f0, roughness);
         color += iblColor * material.occlusion;
     #elif defined(USE_IBL_LIGHTING)
         vec3 positionWC = vec3(czm_inverseView * vec4(position, 1.0));

@@ -177,11 +177,12 @@ vec3 sampleSpecularEnvironment(vec3 cubeDir, float roughness)
         return czm_sampleOctahedralProjection(czm_specularEnvironmentMaps, czm_specularEnvironmentMapSize, cubeDir, lod, maxLod);
     #endif
 }
-vec3 computeSpecularIBL(vec3 cubeDir, float NdotV, float VdotH, vec3 f0, float roughness)
+vec3 computeSpecularIBL(vec3 cubeDir, float NdotV, vec3 f0, float roughness)
 {
-    float reflectance = czm_maximumComponent(f0);
-    vec3 f90 = vec3(clamp(reflectance * 25.0, 0.0, 1.0));
-    vec3 F = fresnelSchlick2(f0, f90, VdotH);
+    // see https://bruop.github.io/ibl/ at Single Scattering Results
+    // Roughness dependent fresnel, from Fdez-Aguera
+    vec3 f90 = max(vec3(1.0 - roughness), f0);
+    vec3 F = fresnelSchlick2(f0, f90, NdotV);
 
     vec2 brdfLut = texture(czm_brdfLut, vec2(NdotV, roughness)).rg;
     vec3 specularSample = sampleSpecularEnvironment(cubeDir, roughness);
@@ -227,11 +228,9 @@ vec3 textureIBL(
     #endif
 
     #ifdef SPECULAR_IBL
-        float NdotV = abs(dot(normalEC, viewDirectionEC)) + 0.001;
-        vec3 halfwayDirectionEC = normalize(viewDirectionEC + lightDirectionEC);
-        float VdotH = clamp(dot(viewDirectionEC, halfwayDirectionEC), 0.0, 1.0);
+        float NdotV = abs(dot(normalEC, viewDirectionEC));
         vec3 f0 = material.specular;
-        vec3 specularContribution = computeSpecularIBL(cubeDir, NdotV, VdotH, f0, material.roughness);
+        vec3 specularContribution = computeSpecularIBL(cubeDir, NdotV, f0, material.roughness);
     #else
         vec3 specularContribution = vec3(0.0); 
     #endif
