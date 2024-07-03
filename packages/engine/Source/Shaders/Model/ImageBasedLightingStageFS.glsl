@@ -133,7 +133,6 @@ float getSunLuminance(vec3 positionWC, vec3 normalEC, vec3 lightDirectionEC)
     // TODO: verify whether to use perceptual or alpha roughness
     vec3 specularIrradiance = getProceduralSpecularIrradiance(reflectionWC, skyMetrics, roughness);
     float NdotV = abs(dot(normalEC, viewDirectionEC)) + 0.001;
-    // TODO: verify if LUT needs perceptual or alpha roughness
     vec2 brdfLut = texture(czm_brdfLut, vec2(NdotV, roughness)).rg;
     vec3 specularColor = czm_srgbToLinear(f0 * brdfLut.x + brdfLut.y);
     vec3 specularContribution = specularIrradiance * specularColor * model_iblFactor.y;
@@ -184,7 +183,6 @@ vec3 computeSpecularIBL(vec3 cubeDir, float NdotV, float VdotH, vec3 f0, float r
     vec3 f90 = vec3(clamp(reflectance * 25.0, 0.0, 1.0));
     vec3 F = fresnelSchlick2(f0, f90, VdotH);
 
-    // TODO: verify if LUT needs perceptual or alpha roughness
     vec2 brdfLut = texture(czm_brdfLut, vec2(NdotV, roughness)).rg;
     vec3 specularSample = sampleSpecularEnvironment(cubeDir, roughness);
 

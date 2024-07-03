@@ -27,27 +27,17 @@ vec2 hammersley2D(int i, int N)
     return vec2(float(i) / float(N), vdcRadicalInverse(i));
 }
 
-vec3 importanceSampleGGX(vec2 xi, float a, vec3 N)
+vec3 importanceSampleGGX(vec2 xi, float alphaRoughness, vec3 N)
 {
+    float alphaRoughnessSquared = alphaRoughness * alphaRoughness;
     float phi = 2.0 * M_PI * xi.x;
-    float cosTheta = sqrt((1.0 - xi.y) / (1.0 + (a * a - 1.0) * xi.y));
+    float cosTheta = sqrt((1.0 - xi.y) / (1.0 + (alphaRoughnessSquared - 1.0) * xi.y));
     float sinTheta = sqrt(1.0 - cosTheta * cosTheta);
     vec3 H = vec3(sinTheta * cos(phi), sinTheta * sin(phi), cosTheta);
     vec3 upVector = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
     vec3 tangentX = normalize(cross(upVector, N));
     vec3 tangentY = cross(N, tangentX);
     return tangentX * H.x + tangentY * H.y + N * H.z;
-}
-
-float G1_Smith(float NdotV, float k)
-{
-    return NdotV / (NdotV * (1.0 - k) + k); // = 1.0 if NdotV = 1.0
-}
-
-float G_Smith(float roughness, float NdotV, float NdotL)
-{
-    float k = roughness * roughness / 2.0;
-    return G1_Smith(NdotV, k) * G1_Smith(NdotL, k); // = 1.0 if NdotV = 1.0
 }
 
 /**
@@ -94,8 +84,8 @@ vec2 integrateBrdf(float roughness, float NdotV)
         float VdotH = clamp(dot(V, H), 0.0, 1.0);
         if (NdotL > 0.0)
         {
-            float G = G_Smith(alphaRoughness, NdotV, NdotL);
-            float G_Vis = G * VdotH / (NdotH * NdotV);
+            float G = smithVisibilityGGX(alphaRoughness, NdotL, NdotV);
+            float G_Vis = 4.0 * G * VdotH * NdotL / NdotH;
             float Fc = pow(1.0 - VdotH, 5.0);
             A += (1.0 - Fc) * G_Vis;
             B += Fc * G_Vis;
